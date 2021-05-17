@@ -1,0 +1,201 @@
+* {
+  font-family: sans-serif;
+}
+
+body {
+  overflow-x: hidden;
+  color: #e6e6e6;
+  background-color: #000;
+  text-align: center;
+  position: relative;
+}
+
+#app {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  color: #e6e6e6;
+}
+
+a:hover {
+  text-decoration: none;
+  color: #fff;
+}
+
+a:link {
+  text-decoration: none;
+}
+
+::-webkit-scrollbar {
+  height: 8px;
+  width: 6px;
+}
+
+::-webkit-scrollbar-thumb {
+  -moz-border-radius: 2em;
+  -webkit-border-radius: 2em;
+  background-color: rgba(255, 255, 255, 0.5);
+  border-radius: 2em;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: #e6e6e6;
+}
+
+::-webkit-scrollbar-corner {
+  background: rgba(0, 0, 0, 0);
+}
+
+::-webkit-scrollbar-track {
+  -moz-border-radius: 2em;
+  -webkit-border-radius: 2em;
+  background-color: transparent;
+  border-radius: 2em;
+}
+
+input:focus,
+select:focus,
+textarea:focus,
+button:focus,
+.button:focus {
+  outline: none;
+}
+
+img {
+  -webkit-app-region: no-drag;
+  transition: 0.1s;
+}
+
+a img {
+  transition: all 0.05s ease-in-out;
+}
+
+a:hover img {
+  filter: opacity(70%);
+  transform: scale(1.1);
+}
+
+/* MAIN STYLE */
+
+.header {
+  padding-top: 10px;
+  height: 40px;
+  z-index: 10;
+  text-align: center;
+}
+
+.header-logo {
+  text-align: center;
+}
+
+.header img {
+  height: 25px;
+}
+
+.footer {
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  height: 60px;
+  z-index: 10;
+  width: 100%;
+  background-color: #000;
+}
+
+.paddingmobile {
+  padding-top: 10vh;
+}
+
+.paddingdesktop {
+  padding-top: 4h;
+}
+
+.gridThis {
+  display: grid;
+  justify-content: center;
+  align-content: center;
+  gap: 4px;
+  grid-auto-flow: column;
+  grid-template-columns: auto auto auto;
+  grid-template-rows: auto;
+}
+
+.card {
+  background-color: #111111;
+  margin: 20px;
+  padding: 40px;
+  border-radius: 10px;
+}
+
+.card img {
+  width: 250px;
+}
+
+button,
+button:hover,
+select,
+select:hover,
+input,
+input:hover,
+textarea,
+textarea:hover,
+a,
+a:active,
+a:hover {
+  outline: 0;
+  outline: none;
+}
+
+*:focus {
+  outline: 0;
+  outline: none;
+}
+
+button,
+input:not([type="radio"]),
+select {
+  line-height: 1em;
+  padding: 14px 24px;
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  margin-top: 10px;
+  -webkit-appearance: none;
+}
+
+button:hover {
+  filter: opacity(70%);
+  transform: scale(1.1);
+}
+
+.bigger {
+  color: #fff;
+  background-color: #da4dfc;
+  font-size: 24px;
+  padding: 24px 44px;
+}
+
+.logo img {
+  height: 100px;
+}
+
+.content {
+  padding-top: 10vh;
+}
+
+@media screen and (max-width: 1200px) {
+  .gridThis {
+    grid-template-columns: auto;
+    grid-template-rows: auto auto auto;
+  }
+
+  .content {
+    padding-top: 4vh;
+  }
+
+  .paddingmobile {
+    padding-top: 4vh;
+  }
+}
