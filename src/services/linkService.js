@@ -3,8 +3,8 @@ const config = require('config');
 const log = require('../lib/log');
 const serviceHelper = require('./serviceHelper');
 
-const mainCollection = config.database.collection.data;
-const discCollection = config.database.collection.dics;
+const mainCollection = config.database.collections.data;
+const discCollection = config.database.collections.dics;
 
 async function processAdapter(req, res) {
   let body = '';
