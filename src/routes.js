@@ -12,16 +12,16 @@ module.exports = (app) => {
   });
   // this is what zelcore is calling to get data of operationid
   // {operationid, reqest, response}
-  app.get('/api/adapter/:?operationid', (req, res) => {
+  app.get('/api/adapter/:operationid?', (req, res) => {
     linkService.operationStatus(req, res);
   });
 
   // this is what link is constantly polling to know if zelcore closed the connection
-  app.get('/api/adapterstatus/:?adapterid', (req, res) => {
+  app.get('/api/adapterstatus/:adapterid?', (req, res) => {
     linkService.adapterStatus(req, res);
   });
   // this is what zelcore is calling if it wants to exit connection
-  app.get('/api/adapterdisconnect/:?adapterid', (req, res) => {
+  app.get('/api/adapterdisconnect/:adapterid?', (req, res) => {
     linkService.zelcoreAsksDisconnect(req, res);
   });
 
