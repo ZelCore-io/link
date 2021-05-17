@@ -4,10 +4,7 @@ const config = require('config');
 const qs = require('qs');
 
 const { MongoClient } = mongodb;
-const user = encodeURIComponent(config.database.username);
-const password = encodeURIComponent(config.database.password);
-const authMechanism = 'DEFAULT';
-const mongoUrl = `mongodb://${user}:${password}@${config.database.url}:${config.database.port}?authMechanism=${authMechanism}&authSource=admin`;
+const mongoUrl = `mongodb://${config.database.url}:${config.database.port}/`;
 
 let openDBConnection = null;
 

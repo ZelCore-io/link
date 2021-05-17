@@ -8,7 +8,7 @@ module.exports = {
     database: 'link',
     collections: {
       data: 'data',
-      disc: 'disconnect',
+      disc: 'disc',
     },
   },
 };

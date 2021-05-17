@@ -4,7 +4,7 @@ const log = require('../lib/log');
 const serviceHelper = require('./serviceHelper');
 
 const mainCollection = config.database.collections.data;
-const discCollection = config.database.collections.dics;
+const discCollection = config.database.collections.disc;
 
 async function processAdapter(req, res) {
   let body = '';
