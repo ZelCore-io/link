@@ -1,11 +1,21 @@
+const axios = require('axios');
 const mongodb = require('mongodb');
 const config = require('config');
 const qs = require('qs');
 
 const { MongoClient } = mongodb;
-const mongoUrl = `mongodb://${config.database.url}:${config.database.port}/`;
+const user = encodeURIComponent(config.database.username);
+const password = encodeURIComponent(config.database.password);
+const authMechanism = 'DEFAULT';
+const mongoUrl = `mongodb://${user}:${password}@${config.database.url}:${config.database.port}?authMechanism=${authMechanism}&authSource=admin`;
 
-function timeout(ms) {
+let openDBConnection = null;
+
+function databaseConnection() {
+  return openDBConnection;
+}
+
+function delay(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
@@ -53,6 +63,18 @@ function createErrorMessage(message, name, code) {
   return errMessage;
 }
 
+function errUnauthorizedMessage() {
+  const errMessage = {
+    status: 'error',
+    data: {
+      code: 401,
+      name: 'Unauthorized',
+      message: 'Unauthorized. Access denied.',
+    },
+  };
+  return errMessage;
+}
+
 function ensureBoolean(parameter) {
   let param;
   if (parameter === 'false' || parameter === 0 || parameter === '0' || parameter === false) {
@@ -91,80 +113,101 @@ async function connectMongoDb(url) {
   const mongoSettings = {
     useNewUrlParser: true,
     useUnifiedTopology: true,
+    poolSize: 10,
   };
-  const db = await MongoClient.connect(connectUrl, mongoSettings).catch((error) => { throw error; });
+  const db = await MongoClient.connect(connectUrl, mongoSettings);
   return db;
 }
 
-async function findInDatabase(database, collection, query, projection) {
-  const results = await database.collection(collection).find(query, projection).toArray().catch((error) => { throw error; });
+async function initiateDB() {
+  openDBConnection = await connectMongoDb();
+  return true;
+}
+
+async function distinctDatabase(database, collection, distinct, query) {
+  const results = await database.collection(collection).distinct(distinct, query);
   return results;
 }
 
-async function findOneInDatabaseReverse(database, collection, query, projection) {
-  const result = await database.collection(collection).find(query, projection).sort({ _id: -1 }).limit(1)
-    .next()
-    .catch((error) => { throw error; });
-  return result;
+async function findInDatabase(database, collection, query, projection) {
+  const results = await database.collection(collection).find(query, projection).toArray();
+  return results;
 }
 
 async function findOneInDatabase(database, collection, query, projection) {
-  const result = await database.collection(collection).findOne(query, projection).catch((error) => { throw error; });
+  const result = await database.collection(collection).findOne(query, projection);
   return result;
 }
 
 async function findOneAndUpdateInDatabase(database, collection, query, update, options) {
   const passedOptions = options || {};
-  const result = await database.collection(collection).findOneAndUpdate(query, update, passedOptions).catch((error) => { throw error; });
+  const result = await database.collection(collection).findOneAndUpdate(query, update, passedOptions);
   return result;
 }
 
 async function insertOneToDatabase(database, collection, value) {
-  const result = await database.collection(collection).insertOne(value).catch((error) => { throw error; });
+  const result = await database.collection(collection).insertOne(value);
   return result;
 }
 
-async function updateOneInDatabase(database, collection, query, value) {
-  const result = await database.collection(collection).updateOne(query, { $set: value }).catch((error) => { throw error; });
+async function updateOneInDatabase(database, collection, query, update, options) {
+  const passedOptions = options || {};
+  const result = await database.collection(collection).updateOne(query, update, passedOptions);
   return result;
 }
 
 async function updateInDatabase(database, collection, query, projection) {
-  const result = await database.collection(collection).updateMany(query, projection).catch((error) => { throw error; });
+  const result = await database.collection(collection).updateMany(query, projection);
   return result;
 }
 
 async function findOneAndDeleteInDatabase(database, collection, query, projection) {
-  const result = await database.collection(collection).findOneAndDelete(query, projection).catch((error) => { throw error; });
+  const result = await database.collection(collection).findOneAndDelete(query, projection);
   return result;
 }
 
 async function removeDocumentsFromCollection(database, collection, query) {
   // to remove all documents from collection, the query is just {}
-  const result = await database.collection(collection).deleteMany(query).catch((error) => { throw error; });
+  const result = await database.collection(collection).deleteMany(query);
   return result;
 }
 
 async function dropCollection(database, collection) {
-  const result = await database.collection(collection).drop().catch((error) => { throw error; });
+  const result = await database.collection(collection).drop();
   return result;
 }
 
 async function collectionStats(database, collection) {
   // to remove all documents from collection, the query is just {}
-  const result = await database.collection(collection).stats().catch((error) => { throw error; });
+  const result = await database.collection(collection).stats();
   return result;
 }
 
+// helper function for timeout on axios connection
+const axiosGet = (url, options = {
+  timeout: 20000,
+}) => {
+  const abort = axios.CancelToken.source();
+  const id = setTimeout(
+    () => abort.cancel(`Timeout of ${options.timeout}ms.`),
+    options.timeout,
+  );
+  return axios
+    .get(url, { cancelToken: abort.token, ...options })
+    .then((res) => {
+      clearTimeout(id);
+      return res;
+    });
+};
+
 module.exports = {
-  timeout,
   ensureBoolean,
   ensureNumber,
   ensureObject,
   ensureString,
   connectMongoDb,
+  distinctDatabase,
   findInDatabase,
-  findOneInDatabaseReverse,
   findOneInDatabase,
   findOneAndUpdateInDatabase,
   insertOneToDatabase,
@@ -178,4 +221,9 @@ module.exports = {
   createSuccessMessage,
   createWarningMessage,
   createErrorMessage,
+  errUnauthorizedMessage,
+  axiosGet,
+  delay,
+  initiateDB,
+  databaseConnection,
 };
