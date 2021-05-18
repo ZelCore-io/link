@@ -15,6 +15,7 @@ module.exports = {
       {
         code: 300,
         ignoreUrls: true,
+        ignoreTrailingComments: true,
       },
     ],
     'no-console': 'off',

@@ -100,19 +100,17 @@ export default {
       origin: null,
       zelcorerequestid: null, // last request id that we are asking for our database
       adapterid: null,
-      opener: null,
       pollinResponseInterval: null,
       network: null,
-      endpint: 'https://link.zelcore.io',
+      endpoint: 'https://link.zelcore.io',
     };
   },
   beforeDestroy() {
-    if (this.opener) {
-      this.opener.postMessage({
+    if (window.opener) {
+      window.opener.postMessage({
         jsonrpc: '2.0',
         method: 'disconnected',
       }, this.origin);
-      this.opener = null;
       const deeplink = `zel:?action=adapter&adapterid=${this.adapterid}&method=disconnected&origin=${this.origin}&network=${this.network}`;
       window.open(deeplink, '_blank');
     }
@@ -152,15 +150,17 @@ export default {
         this.origin = lok.get('origin');
         this.network = lok.get('network');
         this.adapterid = this.id();
-        this.opener = window.opener;
         window.onmessage = (event) => {
-          self.adapterEvent(event);
+          if (event.source === window.opener && event.origin === this.origin) { // veriy origin and source
+            self.adapterEvent(event);
+          }
         };
         setInterval(() => {
           self.pollIsActive();
         }, 2000);
         // constant polling for response
         this.zelcorerequestid = this.id();
+        console.log(this.zelcorerequestid);
         this.pollinResponseInterval = setInterval(() => {
           self.pollGetResponse();
         }, 2000);
@@ -170,11 +170,13 @@ export default {
             coin: 'solana',
             method: 'connected',
             adapterid: this.adapterid,
-            data: window.location.hash.slice(1),
+            data: decodeURIComponent(window.location.hash.slice(1)),
           },
         };
-        await axios.post(`${this.endpoint}/api/adapter`, data); // no need response
+        const res = await axios.post(`${this.endpoint}/api/adapter`, data); // no need response
+        console.log(res);
         const deeplink = `zel:?action=adapter&adapterid=${this.adapterid}&method=connected&origin=${this.origin}&network=${this.network}&operationid=${this.zelcorerequestid}`;
+        console.log(deeplink);
         window.open(deeplink, '_blank');
       } catch (error) {
         console.log(error);
@@ -182,6 +184,7 @@ export default {
     },
     adapterEvent(event) {
       // new incoming request
+      console.log(event);
       const self = this;
       this.zelcorerequestid = this.id();
       clearInterval(this.pollinResponseInterval);
@@ -190,7 +193,6 @@ export default {
         self.pollGetResponse();
       }, 2000);
       // incoming event message to process TODO
-      console.log(event);
       // const deeplink = `zel:?action=adapter&adapterid=${this.adapterid}&method=connected&origin=${this.origin}&network=${this.network}&operationid=${this.zelcorerequestid}`;
       // window.open(deeplink, '_blank');
     },
@@ -212,10 +214,10 @@ export default {
       }
     },
     async pollIsActive() {
-      if (this.opener && this.adapterid) {
+      if (window.opener && this.adapterid) {
         const status = await axios.get(`${this.endpoint}/api/adapterstatus/${this.adapterid}`);
         if (status.data === 'disconnect') {
-          this.opener.postMessage({
+          window.opener.postMessage({
             jsonrpc: '2.0',
             method: 'disconnected',
           }, this.origin);
