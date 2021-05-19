@@ -215,7 +215,7 @@ export default {
       if (event.data.params.data) {
         try {
           // according to specs it shall be uint8array
-          const enc = new TextDecoder(event.data.params.display || 'utf-8');
+          const enc = new TextDecoder();
           const text = enc.decode(event.data.params.data);
           data.request.params.data = text;
         } catch (error) {
