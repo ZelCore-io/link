@@ -17,6 +17,10 @@
           OPEN IN ZELCORE
         </button>
       </div>
+      <div class="note">
+        <br>
+        Please allow pop up windows for smooth zelcore interaction.
+      </div>
       <div class="gridThis paddingmobile">
         <div class="card">
           <a
@@ -103,6 +107,7 @@ export default {
       pollinResponseInterval: null,
       network: null,
       endpoint: 'https://link.zelcore.io',
+      storedLink: null,
     };
   },
   beforeDestroy() {
@@ -136,7 +141,8 @@ export default {
       const deeplink = 'zel:?';
       const page = deeplink + window.location.pathname.substring(1) + window.location.search;
       console.log(page);
-      window.open(page, '_blank');
+      const link = this.storedLink || page;
+      window.open(link, '_blank');
     },
     id() {
       const timestamp = new Date().getTime();
@@ -146,9 +152,11 @@ export default {
     async initiateAdapter() {
       try {
         const self = this;
+        console.log('1');
         const lok = new URLSearchParams(window.location.hash.slice(1));
         this.origin = lok.get('origin');
         this.network = lok.get('network');
+        console.log('2');
         this.adapterid = this.id();
         window.onmessage = (event) => {
           if (event.source === window.opener && event.origin === this.origin) { // veriy origin and source
@@ -158,6 +166,7 @@ export default {
         setInterval(() => {
           self.pollIsActive();
         }, 2000);
+        console.log('3');
         // constant polling for response
         this.zelcorerequestid = this.id();
         console.log(this.zelcorerequestid);
@@ -173,9 +182,11 @@ export default {
             data: decodeURIComponent(window.location.hash.slice(1)),
           },
         };
+        console.log('4');
         const res = await axios.post(`${this.endpoint}/api/adapter`, data); // no need response
         console.log(res);
         const deeplink = `zel:?action=adapter&adapterid=${this.adapterid}&method=connected&origin=${this.origin}&network=${this.network}&operationid=${this.zelcorerequestid}`;
+        this.storedLink = deeplink;
         console.log(deeplink);
         window.open(deeplink, '_blank');
       } catch (error) {

@@ -6,7 +6,7 @@ const cache = apicache.middleware;
 
 module.exports = (app) => {
   // this is what link is calling to post some data from dApp and save it to database (filling request field). Later zelcore is calling the same and filing response field
-  // {operationid, reqest, response}
+  // {operationid, request, response}
   app.post('/api/adapter', (req, res) => {
     linkService.processAdapter(req, res);
   });
