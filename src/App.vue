@@ -108,6 +108,7 @@ export default {
       network: null,
       endpoint: 'https://link.zelcore.io',
       storedLink: null,
+      eventid: null,
     };
   },
   beforeDestroy() {
@@ -152,11 +153,9 @@ export default {
     async initiateAdapter() {
       try {
         const self = this;
-        console.log('1');
         const lok = new URLSearchParams(window.location.hash.slice(1));
         this.origin = lok.get('origin');
         this.network = lok.get('network');
-        console.log('2');
         this.adapterid = this.id();
         window.onmessage = (event) => {
           if (event.source === window.opener && event.origin === this.origin) { // veriy origin and source
@@ -166,7 +165,6 @@ export default {
         setInterval(() => {
           self.pollIsActive();
         }, 2000);
-        console.log('3');
         // constant polling for response
         this.zelcorerequestid = this.id();
         console.log(this.zelcorerequestid);
@@ -182,7 +180,6 @@ export default {
             data: decodeURIComponent(window.location.hash.slice(1)),
           },
         };
-        console.log('4');
         const res = await axios.post(`${this.endpoint}/api/adapter`, data); // no need response
         console.log(res);
         const deeplink = `zel:?action=adapter&adapterid=${this.adapterid}&method=connected&origin=${this.origin}&network=${this.network}&operationid=${this.zelcorerequestid}`;
@@ -193,7 +190,7 @@ export default {
         console.log(error);
       }
     },
-    adapterEvent(event) {
+    async adapterEvent(event) {
       // new incoming request
       console.log(event);
       const self = this;
@@ -203,9 +200,21 @@ export default {
       this.pollinResponseInterval = setInterval(() => {
         self.pollGetResponse();
       }, 2000);
-      // incoming event message to process TODO
-      // const deeplink = `zel:?action=adapter&adapterid=${this.adapterid}&method=connected&origin=${this.origin}&network=${this.network}&operationid=${this.zelcorerequestid}`;
-      // window.open(deeplink, '_blank');
+      this.eventid = event.data.id;
+      const deeplink = `zel:?action=adapter&adapterid=${this.adapterid}&method=${event.data.method}&origin=${this.origin}&network=${this.network}&operationid=${this.zelcorerequestid}`;
+      this.storedLink = deeplink;
+      const data = {
+        operationid: this.zelcorerequestid,
+        request: {
+          coin: 'solana',
+          method: event.data.method,
+          adapterid: this.adapterid,
+          data: event.data.params,
+        },
+      };
+      const res = await axios.post(`${this.endpoint}/api/adapter`, data); // no need response
+      console.log(res);
+      window.open(deeplink, '_blank');
     },
     async pollGetResponse() {
       try {
@@ -213,6 +222,7 @@ export default {
         if (response.data.data.response) {
           // zelcore already responded to it
           window.opener.postMessage({
+            id: this.eventid,
             jsonrpc: '2.0',
             method: response.data.data.request.method,
             params: response.data.data.response,

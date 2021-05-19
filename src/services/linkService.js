@@ -86,9 +86,9 @@ async function adapterStatus(req, res) {
         _id: 0,
       },
     };
-    const user = await serviceHelper.findOneInDatabase(database, discCollection, query, projection);
-    if (user) {
-      res.json(user.status);
+    const adapter = await serviceHelper.findOneInDatabase(database, discCollection, query, projection);
+    if (adapter) {
+      res.json(adapter.status);
     } else {
       res.json('connected');
     }
