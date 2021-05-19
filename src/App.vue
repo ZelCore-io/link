@@ -177,7 +177,7 @@ export default {
             coin: 'solana',
             method: 'connected',
             adapterid: this.adapterid,
-            data: decodeURIComponent(window.location.hash.slice(1)),
+            params: decodeURIComponent(window.location.hash.slice(1)),
           },
         };
         const res = await axios.post(`${this.endpoint}/api/adapter`, data); // no need response
@@ -209,7 +209,7 @@ export default {
           coin: 'solana',
           method: event.data.method,
           adapterid: this.adapterid,
-          data: event.data.params,
+          params: event.data.params,
         },
       };
       const res = await axios.post(`${this.endpoint}/api/adapter`, data); // no need response
