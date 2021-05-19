@@ -212,6 +212,16 @@ export default {
           params: event.data.params,
         },
       };
+      if (event.data.params.data) {
+        try {
+          // according to specs it shall be uint8array
+          const enc = new TextDecoder(event.data.params.display || 'utf-8');
+          const text = enc.decode(event.data.params.data);
+          data.request.params.data = text;
+        } catch (error) {
+          console.log(error);
+        }
+      }
       const res = await axios.post(`${this.endpoint}/api/adapter`, data); // no need response
       console.log(res);
       window.open(deeplink, '_blank');
