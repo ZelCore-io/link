@@ -25,6 +25,34 @@ module.exports = (app) => {
     linkService.zelcoreAsksDisconnect(req, res);
   });
 
+  // sol-wallet-adapter test app
+  // https://github.com/project-serum/sol-wallet-adapter
+  app.get('/testdapp', cache('5 minutes'), (req, res) => {
+    res.sendFile(path.join(__dirname, '../testdapp/index.html'));
+  });
+  app.get('/static/js/2.6e96e63f.chunk.js', cache('5 minutes'), (req, res) => {
+    res.sendFile(path.join(__dirname, '../testdapp/static/js/2.6e96e63f.chunk.js'));
+  });
+  app.get('/static/css/main.a1524731.chunk.css', cache('5 minutes'), (req, res) => {
+    res.sendFile(path.join(__dirname, '../testdapp/static/css/main.a1524731.chunk.css'));
+  });
+  app.get('/static/js/main.31c8aaca.chunk.js', cache('5 minutes'), (req, res) => {
+    res.sendFile(path.join(__dirname, '../testdapp/static/js/main.31c8aaca.chunk.js'));
+  });
+  app.get('/manifest.json', cache('5 minutes'), (req, res) => {
+    res.sendFile(path.join(__dirname, '../testdapp/manifest.json'));
+  });
+  app.get('/static/js/main.31c8aaca.chunk.js.map', cache('5 minutes'), (req, res) => {
+    res.sendFile(path.join(__dirname, '../testdapp/static/js/main.31c8aaca.chunk.js.map'));
+  });
+  app.get('/static/js/2.6e96e63f.chunk.js.map', cache('5 minutes'), (req, res) => {
+    res.sendFile(path.join(__dirname, '../testdapp/static/js/2.6e96e63f.chunk.js.map'));
+  });
+  app.get('/static/css/main.a1524731.chunk.css.map', cache('5 minutes'), (req, res) => {
+    res.sendFile(path.join(__dirname, '../testdapp/static/css/main.a1524731.chunk.css.map'));
+  });
+
+  // LINK UI
   app.get('/', cache('5 minutes'), (req, res) => {
     res.sendFile(path.join(__dirname, '../dist/index.html'));
   });
