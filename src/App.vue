@@ -226,6 +226,7 @@ export default {
             jsonrpc: '2.0',
             method: response.data.data.request.method,
             params: response.data.data.response,
+            result: response.data.data.response,
           }, this.origin);
           clearInterval(this.pollinResponseInterval);
           this.pollinResponseInterval = null;
