@@ -11,7 +11,6 @@
           <img src="./assets/img/zelcore-round-dark.svg">
         </div>
         <button
-          id="openZelcoreButton"
           class="bigger"
           @click="openzelcoreDeepLink"
         >
@@ -123,6 +122,7 @@ export default {
     }
   },
   mounted() {
+    const self = this;
     console.log(window.location.pathname.substring(1));
     console.log(window.location.search);
     const origin = new URLSearchParams(window.location.hash.slice(1)).get('origin');
@@ -133,7 +133,7 @@ export default {
       this.initiateAdapter();
     } else {
       setTimeout(() => {
-        document.getElementById('openZelcoreButton').click();
+        self.openzelcoreDeepLink();
       }, 2000);
     }
   },
